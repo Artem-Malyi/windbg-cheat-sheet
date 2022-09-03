@@ -207,7 +207,25 @@ Conditional breakpoints allows you to break if a some DX expression evaluates to
 ## Analyzing Program State
 
 - Use memory window to see raw memory
-- use "dt" to see observe data structures
+- use "dt" (Display Type) to observe data structures:
+```
+kd> dt ntdll!_RTL_USER_PROCESS_PARAMETERS 000002e16e9d5ec0 
+   +0x000 MaximumLength    : 0x788
+   +0x004 Length           : 0x788
+   +0x008 Flags            : 1
+   +0x00c DebugFlags       : 0
+   +0x010 ConsoleHandle    : 0xffffffff`fffffffd Void
+   +0x018 ConsoleFlags     : 0
+   +0x020 StandardInput    : (null) 
+   +0x028 StandardOutput   : 0x00000000`000013fc Void
+   +0x030 StandardError    : (null) 
+   +0x038 CurrentDirectory : _CURDIR
+   +0x050 DllPath          : _UNICODE_STRING ""
+   +0x060 ImagePathName    : _UNICODE_STRING "C:\Windows\System32\bitsadmin.exe"
+   +0x070 CommandLine      : _UNICODE_STRING ""C:\Windows\System32\bitsadmin.exe" /rawreturn /nowrap /list /allusers /verbose"
+   +0x080 Environment      : 0x000002e1`6e9d6648 Void
+   ... (the output continues)
+```
 - use "dx" to evaluate C++ Expressions
 - ```k``` - stack trace
 
