@@ -734,6 +734,28 @@ r $t1 = poi(@$t0 + 0x68)
 bp /p ffff9381c148b080 nt!NtCreateUserProcess "$$<D:\\ws\\windbg-breakpoint-NtCreateUserProcess.txt"
 ```
 
+### Stepping from User mode into Kernel mode in WinDbg + VirtualKD-redux
+Shown below is a simple demo of breaking on user part and single stepping into kernel part on notepad.exe for file->open from menu (this will trigger the break on NtCreateFile)
+
+Look for specific binary (notepad.exe in your case and set process specific breakpoint on user stub in ntdll and executive implementation on kernel.
+```
+1: kd> $$ look for relevent process
+1: kd> !process 0 0 notepad.exe
+PROCESS ffffc50d96c97080
+    SessionId: 1  Cid: 10a0    Peb: 3fe1263000  ParentCid: 1008
+    DirBase: 1e3c0002  ObjectTable: ffff8787c380b700  HandleCount: 568.
+    Image: notepad.exe
+
+1: kd> bp /p ffffc50d96c97080 ntdll!NtCreateFile
+1: kd> bp /p ffffc50d96c97080 nt!NtCreateFile
+1: kd> bl
+     0 e Disable Clear  00007ff9`7fcf0100     0001 (0001) ntdll!NtCreateFile
+     Match process data ffffc50d`96c97080
+     1 e Disable Clear  fffff800`4f8914e0     0001 (0001) nt!NtCreateFile
+     Match process data ffffc50d`96c97080
+```
+Execute and let the target run using `g`, and after that it can be stepped with `p`
+
 ## Minifilter Debugging
 
 ....
