@@ -706,6 +706,34 @@ There are 2 ways to put a breakpoint on a managed method:
 2. If the method is not jitted yet, you can use the ```!bpmd``` command.
 
 
+### Conditional breakpoint example for nt!NtCreateUserProcess
+
+- `!process 0 0 cmd.exe` - get EPROCESS address by the process image name
+- `bp /p ffffc80f13092080 nt!NtCreateUserProcess`- set breakpoint in kernel code only for the given process 
+- `r $t0 = poi(@rsp+8*9)` - get pointer to _RTL_USER_PROCESS_PARAMETERS structure from call stack (9-th parameter of NtCreateUserProcess())
+- `??((ntdll!_RTL_USER_PROCESS_PARAMETERS*)@$t0)->ImagePathName.Buffer` - check the name of the process
+- `dt ntdll!_RTL_USER_PROCESS_PARAMETERS @$t0` - note the offset of the ImagePathName.Buffer field in the structure, in this case it's 0x68
+- `r $t1 = poi(@$t0 + 0x68)` - get pointer to UTF-16 string of the full path to process
+- `as /mu ${/v:ImageName} @$t1` - create alias "ImageName" that references the string in memory
+- `.if ($spat(@"${ImageName}", "*calc*")) {.echo ok} .else {.echo nok}` - perform search of the pattern in the memory, referenced by ImageName alias
+
+
+### Conditional breakpoint example for nt!NtCreateUserProcess with given image path
+The example below sets a breakpoint on nt!NtCreateUserProcess in the given cmd.exe process, only when it creates calc.exe process  
+
+1. Create the following WinDbg commands file `d:\ws\windbg-breapoint-NtCreateUserProcess.txt`:
+```
+r $t0 = poi(@rsp + 8*9)
+r $t1 = poi(@$t0 + 0x68)
+.if (@$t1 != 0) { as /mu ${/v:ImagePathName} @$t1 } .else { ad /q ${/v:ImagePathName} }
+.if ($spat(@"${ImagePathName}", "*calc*") == 0) { gc } .else { .echo ImagePathName }
+```
+
+2. Reference the commands file from WinDbg:
+```
+bp /p ffff9381c148b080 nt!NtCreateUserProcess "$$<D:\\ws\\windbg-breakpoint-NtCreateUserProcess.txt"
+```
+
 ## Minifilter Debugging
 
 ....
