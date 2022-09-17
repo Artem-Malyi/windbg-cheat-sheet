@@ -8,7 +8,6 @@ This cheat sheet / mini guide will be updated as I do new stuff with WinDbg.
 ### Installing the debugging tools
 
 - To use windbg, you have to install the [Windows Debugging Tools](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/).
-- I recommend to install Windbg Preview from the Windows Store.
 
 ### Setting a VM
 
@@ -130,6 +129,7 @@ stop the driver, recompile, move the files into the VM, and start the driver aga
 - ```.<command>``` - run a command. This command is built-into the debugger
 - ```!<command>``` - run an extension. Some extensions arrive by default, like "!process"
 - Control-Break - Abort Long Running Operation / Debug Break
+- ```.hh``` - open a comprehensive Windbg Help reference in a separate GUI window
 
 ## Exploring Modules And Symbols
 
@@ -147,6 +147,7 @@ use .reload when changing the process context or when you're missing a specific 
 - ```x``` (Examine): Prints loaded symbols - ```x <module_name>!<symbol_name>``` - you can use wildcard on both sides
     - Search for a function by name: ```x MyDllName!FunctionName```
     - Search for a function with wildcards ```x MyDllName!*Func``` (ends with Func)
+- ```ln <address>``` (List Nearest Symbols) - displays the symbols at or near the given address
 
 ## Source Navigation
 
@@ -202,6 +203,7 @@ Conditional breakpoints allows you to break if a some DX expression evaluates to
 - (F5) ```g``` : (go) continue
 - (F10) : step over
 - (F11) : step into
+- (Shoft + F11) ```gu``` : (go up, Step Out) - execute until the current function is complete
 - ```tt``` - Trace until next return
 
 ## Analyzing Program State
@@ -233,7 +235,7 @@ kd> dt ntdll!_RTL_USER_PROCESS_PARAMETERS 000002e16e9d5ec0
 
 When debugging, it's useful to see the function arguments.
 
-The first 4 arguments are in: rcx, rdx, r8, r9. Also, the caller allocates a shadow space for them, but the caller does not 
+The first 4 arguments are in: rcx, rdx, r8, r9. Also, the caller allocates a shadow space in stack for them (4 quadwords), but the caller does not 
 store the arguments in this space (it's reserved for the callee)
 
 
