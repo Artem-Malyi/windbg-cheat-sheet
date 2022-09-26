@@ -158,7 +158,7 @@ use .reload when changing the process context or when you're missing a specific 
 ## Breakpoints
 
 These are the commands for int3 breakpoints.
-- bp - normal breakpoint
+- `bp` - normal breakpoint
 - Breakpoint On DriverEntry - If your driver is not loaded yet, you cannot use "bp MyDriver!DriverEntry" because this symbol
 is not known yet. You can use the "bu" command, this allows to put a breakpoint on the driver entry because those breakpoints are calculated when a driver is loaded. Another trick to break at the load of drivers (Useful in case you don't have symbols) is breaking
 in ntoskrnl.exe where DriverEntry is called. (For example, IopLoadDriver)
@@ -193,9 +193,9 @@ bp ntdll!LdrpInitializeProcess "bp /1 KERNEL32!BaseThreadInitThunk; g"
 ```
 ### On access breakpoit a.k.a. data breakpoint
 
-This breakpoint is triggered when the specified memory is accessed (for read, write or execute operation).
+This breakpoint is triggered when the specified memory is accessed (for read, write or execute operation). This breakpoint type uses special debug CPU registers: DR0, DR1, DR2, DR3 for linear addresses to stop on, and DR6, DR7 - for debug flags. So in total it's possible to set up only 4 access breakpoints at the same time.
 
-- ba w 4 0x000002e1`6e9d6648 : break when 4 bytes at given address will be overwritten
+- `ba w 4 0x000002e1`6e9d6648` : break when 4 bytes at given address will be overwritten
 
 ### Conditional breakpoints 
 
@@ -217,7 +217,7 @@ Conditional breakpoints allows you to break if a some DX expression evaluates to
 ## Analyzing Program State
 
 - Use memory window to see raw memory
-- use "dt" (Display Type) to observe data structures:
+- use `dt` (Display Type) to observe data structures:
 ```
 kd> dt ntdll!_RTL_USER_PROCESS_PARAMETERS 000002e16e9d5ec0 
    +0x000 MaximumLength    : 0x788
@@ -236,10 +236,10 @@ kd> dt ntdll!_RTL_USER_PROCESS_PARAMETERS 000002e16e9d5ec0
    +0x080 Environment      : 0x000002e1`6e9d6648 Void
    ... (the output continues)
 ```
-- use "dx" to evaluate C++ Expressions
-- `da`,`db`,`dw`,`dd`,`dq` [address|range] - display memory at given virtual addresses: as ascii chars, as bytes + ascii, as machine words (2 bytes), as double-words (4 bytes), as quad-words (8 bytes)
-- `!db`, `!dd`, `!dq` [physical address] - display memory at specified physical address
-- ```k``` - stack trace
+- use `dx` to evaluate C++ Expressions
+- `da | db | dw | dd | dq [address|range]` - display memory at given virtual addresses: as ascii chars, as bytes + ascii, as machine words (2 bytes), as double-words (4 bytes), as quad-words (8 bytes)
+- `!db | !dd | !dq [physical address]` - display memory at specified physical address
+- `k` - stack trace
 
 #### Function arguments
 
