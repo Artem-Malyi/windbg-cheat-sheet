@@ -191,8 +191,13 @@ Break right before the process entry point in kernel debugging:
 ```
 bp ntdll!LdrpInitializeProcess "bp /1 KERNEL32!BaseThreadInitThunk; g"
 ```
+### On access breakpoit a.k.a. data breakpoint
 
-### Conditional breakpoints
+This breakpoint is triggered when the specified memory is accessed (for read, write or execute operation).
+
+- ba w 4 0x000002e1`6e9d6648 : break when 4 bytes at given address will be overwritten
+
+### Conditional breakpoints 
 
 Conditional breakpoints allows you to break if a some DX expression evaluates to true.
 
@@ -202,11 +207,12 @@ Conditional breakpoints allows you to break if a some DX expression evaluates to
 
 ## Tracing and Stepping
 
-- (F5) ```g``` : (go) continue
+- (F5) `g` : (go) continue
 - (F10) : step over
 - (F11) : step into
-- (Shoft + F11) ```gu``` : (go up, Step Out) - execute until the current function is complete
-- ```tt``` - Trace until next return
+- (Shoft + F11) `gu` : (go up, Step Out) - execute until the current function is complete
+- `tt` - Trace until next return (stops before ret CPU instruction)
+- `pc` (Step to Next Call) - executes the program until a call instruction is reached.
 
 ## Analyzing Program State
 
@@ -231,6 +237,8 @@ kd> dt ntdll!_RTL_USER_PROCESS_PARAMETERS 000002e16e9d5ec0
    ... (the output continues)
 ```
 - use "dx" to evaluate C++ Expressions
+- `da`,`db`,`dw`,`dd`,`dq` [address|range] - display memory at given virtual addresses: as ascii chars, as bytes + ascii, as machine words (2 bytes), as double-words (4 bytes), as quad-words (8 bytes)
+- `!db`, `!dd`, `!dq` [physical address] - display memory at specified physical address
 - ```k``` - stack trace
 
 #### Function arguments
