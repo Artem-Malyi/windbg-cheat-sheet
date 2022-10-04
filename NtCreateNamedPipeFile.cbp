@@ -1,0 +1,64 @@
+$$
+$$ NtCreateNamedPipeFile.cbp
+$$
+$$ WinDbg conditional breakpoint script for NtCreateNamedPipeFile
+$$
+$$ Expected to be called like this (put your string pattern here):
+$$ as ${/v:PipeNameStringPattern} "*InitShutdown*"
+$$ bp nt!NtCreateNamedPipeFile "$$<D:\\ws\\NtCreateNamedPipeFile.cbp"
+$$
+$$
+$$ NTSYSCALLAPI
+$$ NTSTATUS
+$$ NTAPI
+$$ NtCreateNamedPipeFile(
+$$     _Out_ PHANDLE FileHandle,
+$$     _In_ ACCESS_MASK DesiredAccess,
+$$     _In_ POBJECT_ATTRIBUTES ObjectAttributes,
+$$     _Out_ PIO_STATUS_BLOCK IoStatusBlock,
+$$     _In_ ULONG ShareAccess,
+$$     _In_ ULONG CreateDisposition,
+$$     _In_ ULONG CreateOptions,
+$$     _In_ ULONG NamedPipeType,
+$$     _In_ ULONG ReadMode,
+$$     _In_ ULONG CompletionMode,
+$$     _In_ ULONG MaximumInstances,
+$$     _In_ ULONG InboundQuota,
+$$     _In_ ULONG OutboundQuota,
+$$     _In_opt_ PLARGE_INTEGER DefaultTimeout
+$$ );
+$$
+$$
+$$ 1: kd> dt -r nt!_OBJECT_ATTRIBUTES
+$$    +0x000 Length           : Uint4B
+$$    +0x008 RootDirectory    : Ptr64 Void
+$$    +0x010 ObjectName       : Ptr64 _UNICODE_STRING
+$$       +0x000 Length           : Uint2B
+$$       +0x002 MaximumLength    : Uint2B
+$$       +0x008 Buffer           : Ptr64 Wchar
+$$    +0x018 Attributes       : Uint4B
+$$    +0x020 SecurityDescriptor : Ptr64 Void
+$$    +0x028 SecurityQualityOfService : Ptr64 Void
+$$
+$$
+$$ $t0 contains the address of UNICODE_STRING:
+$$ 1: kd> dt -r nt!_UNICODE_STRING
+$$    +0x000 Length           : Uint2B
+$$    +0x002 MaximumLength    : Uint2B
+$$    +0x008 Buffer           : Ptr64 Wchar
+$$
+
+$$ Store address of ObjectAttributes->ObjectName in $t0.
+r $t0 = poi(@r8 + 0x10)
+
+$$ Store address of ObjectName->Buffer in $t1.
+r $t1 = poi(@$t0 + 0x8)
+
+$$ Print the pipe name
+.printf "### NtCreateNamedPipeFile(%mu) ###\n", @$t1
+
+$$ Create an alias for the wide string denoting pipe name
+.if (@$t1 != 0) { as /mu ${/v:PipeName} @$t1 } .else { ad /q ${/v:PipeName} }
+
+$$ Break only if the pipe name contains the specified string pattern
+.if ($spat(@"${PipeName}", @${PipeNameStringPattern}) == 0) { gc } .else { .printf "### Breaking in... ###\n" }
