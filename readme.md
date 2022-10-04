@@ -813,6 +813,16 @@ Execute and let the target run using `g`, and after that it can be stepped with 
 
 ....
 
+## List all open named pipes
+```
+1: kd> !object \device\namedpipe
+Object: ffffc20e152e88f0  Type: (ffffc20e12ce1820) Device
+    ObjectHeader: ffffc20e152e88c0 (new version)
+    HandleCount: 0  PointerCount: 2
+    Directory Object: ffff928e6ba5b8d0  Name: NamedPipe
+1: kd> !devhandles ffffc20e152e88f0
+
+```
 
 ## TODO
 
