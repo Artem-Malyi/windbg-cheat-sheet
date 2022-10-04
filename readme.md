@@ -717,6 +717,47 @@ There are 2 ways to put a breakpoint on a managed method:
 1. Find the address of jitted code using ```!dumpmd``` and use the regular ```bp``` command.
 2. If the method is not jitted yet, you can use the ```!bpmd``` command.
 
+## Conditional breakpoint scripts
+
+### For NtCreateUserProcess
+```
+$$
+$$ NtCreateUserProcess.cbp
+$$
+$$ WinDbg conditional breakpoint script for NtCreateUserProcess
+$$
+$$ Expected to be called like this (put your string pattern here):
+$$ as ${/v:ProcessNameStringPattern} "*calc*"
+$$ bp nt!NtCreateUserProcess "$$<D:\\ws\\NtCreateUserProcess.cbp"
+$$
+$$
+r $t0 = poi(@rsp + 8*9)
+r $t1 = poi(@$t0 + 0x68)
+.printf "### NtCreateUserProcess(%mu) ###\n", @$t1
+.if (@$t1 != 0) { as /mu ${/v:ImagePathName} @$t1 } .else { ad /q ${/v:ImagePathName} }
+.if ($spat(@"${ImagePathName}", @${ProcessNameStringPattern}) == 0) { gc } .else { .printf "### Breaking in... ###\n" }
+```
+Example: [NtCreateUserProcess.cbp](NtCreateUserProcess.cbp)
+
+### For NtCreateNamedPipeFile
+```
+$$
+$$ NtCreateNamedPipeFile.cbp
+$$
+$$ WinDbg conditional breakpoint script for NtCreateNamedPipeFile
+$$
+$$ Expected to be called like this (put your string pattern here):
+$$ as ${/v:PipeNameStringPattern} "*InitShutdown*"
+$$ bp nt!NtCreateNamedPipeFile "$$<D:\\ws\\NtCreateNamedPipeFile.cbp"
+$$
+$$
+r $t0 = poi(@r8 + 0x10)
+r $t1 = poi(@$t0 + 0x8)
+.printf "### NtCreateNamedPipeFile(%mu) ###\n", @$t1
+.if (@$t1 != 0) { as /mu ${/v:PipeName} @$t1 } .else { ad /q ${/v:PipeName} }
+.if ($spat(@"${PipeName}", @${PipeNameStringPattern}) == 0) { gc } .else { .printf "### Breaking in... ###\n" }
+```
+Example: [NtCreateNamedPipeFile.cbp](NtCreateNamedPipeFile.cbp)
 
 ### Conditional breakpoint example for nt!NtCreateUserProcess
 
