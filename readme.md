@@ -163,12 +163,15 @@ use .reload when changing the process context or when you're missing a specific 
 These are the commands for int3 breakpoints.
 - `bp` - normal breakpoint
 - Breakpoint On DriverEntry - If your driver is not loaded yet, you cannot use "bp MyDriver!DriverEntry" because this symbol
-is not known yet. You can use the "bu" command, this allows to put a breakpoint on the driver entry because those breakpoints are calculated when a driver is loaded. Another trick to break at the load of drivers (Useful in case you don't have symbols) is breaking
-in ntoskrnl.exe where DriverEntry is called. (For example, IopLoadDriver)
+is not known yet. You can use the "bu" command, this allows to put a breakpoint on the driver entry because those breakpoints are calculated when a driver is loaded.
+- Breakpoint On DriverEntry without symbols:
+  - `sxe -c ".echo SomeDrv loaded;" ld:SomeDrv.sys` - to break in exactly after the driver's image was loaded but before the call to its EntryPoint
+  - `lmsm` - to find and note the starting base address of the driver of interest
+  - 'bp <base_address + RVA of the EntryPoint from PE header>'
 - ```bl``` - list breakpoints
 - ```bc *``` / ```bc <breakpoint_id>``` - clear breakpoint
 - ```bp /1 <location>``` - temporary breakpoint (break 1 time..)
-- Breaking on source lines - 
+- Breaking on source lines:
 	- You can use F9 while placing the cursor on a specific line of code.
 	- Old Method: Find the source line using the status bar and run <code>bp `<sourcefile>:<line>`</code>
 	- Sometimes this method is too slow because it cannot know which module you are trying to break on, so it'll
