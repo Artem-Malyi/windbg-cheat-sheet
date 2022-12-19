@@ -3,6 +3,9 @@
 My personal cheat sheet for using WinDbg for kernel debugging based on [repnz](https://repnz.github.io/)'s work.
 This cheat sheet / mini guide will be updated as I do new stuff with WinDbg.
 
+
+![](windbg-cheat-sheet.jpg?raw=true)
+
 ## Kernel Debugging Setup
 
 ### Installing the debugging tools
