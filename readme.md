@@ -547,6 +547,16 @@ image that you are debugging.
 
 That will allow to put breakpoints by using symbols from this image. :)
 
+# Get to user mode thread from kd
+```
+!process 0 0 mmc.exe
+.process /i ffff9e82f808d080 <- EPROCESS address
+g
+!process
+.thread /p /r ffff9e82dc60d080 <- ETHREAD address
+k
+```
+
 ## Debugging RPC 
 
 - Set a breakpoint on RPC method invocation: ```bp RPCRT4!Invoke```
