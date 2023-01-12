@@ -547,7 +547,7 @@ image that you are debugging.
 
 That will allow to put breakpoints by using symbols from this image. :)
 
-# Get to user mode thread from kd
+### Get to user mode thread from kd
 ```
 !process 0 0 mmc.exe
 .process /i ffff9e82f808d080 <- EPROCESS address
