@@ -166,7 +166,7 @@ These are the commands for int3 breakpoints.
 is not known yet. You can use the "bu" command, this allows to put a breakpoint on the driver entry because those breakpoints are calculated when a driver is loaded.
 - Breakpoint On DriverEntry without symbols:
   - `sxe -c ".echo SomeDrv loaded;" ld:SomeDrv.sys` - to break in exactly after the driver's image was loaded but before the call to its EntryPoint
-  - `lmsm` - to find and note the starting base address of the driver of interest
+  - `lmsm` or `lmnm <name>` - to find and note the starting base address of the driver of interest
   - 'bp <base_address + RVA of the EntryPoint from PE header>'
 - ```bl``` - list breakpoints
 - ```bc *``` / ```bc <breakpoint_id>``` - clear breakpoint
