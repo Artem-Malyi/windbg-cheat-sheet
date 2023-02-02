@@ -1,0 +1,73 @@
+$$
+$$ PrintIrpDetails.cbp
+$$
+$$ WinDbg conditional breakpoint script for Dispatch routines
+$$
+$$ Expected to be called like this:
+$$ bp SomeDriver!SomeDispatchRoutine "$$<D:\\ws\\PrintIrpDetails.cbp"
+$$
+$$ Breakpoint On DriverEntry without symbols:
+$$ sxe -c ".echo SomeDrv loaded" ld:SomeDrv.sys - to break in exactly after the driver's image was loaded but before the call to its EntryPoint
+$$ lmsm or lmnm <name> - to find and note the starting base address of the driver of interest
+$$ bp <base_address + RVA of the EntryPoint from PE header>
+$$
+$$ 0: kd> dt @rdx IRP
+$$ Local var @ 0xffffe58612723808 Type _IRP*
+$$ 0xffffbf06`e505ea20 
+$$     +0x000 Type             : 0n6
+$$     +0x002 Size             : 0x550
+$$     +0x008 MdlAddress       : (null) 
+$$     +0x010 Flags            : 0x60000
+$$     +0x018 AssociatedIrp    : <unnamed-tag>
+$$     +0x020 ThreadListEntry  : _LIST_ENTRY [ 0xffffbf06`c9657530 - 0xffffbf06`c9657530 ]
+$$     +0x030 IoStatus         : _IO_STATUS_BLOCK
+$$     +0x040 RequestorMode    : 1 ''
+$$     +0x041 PendingReturned  : 0 ''
+$$     +0x042 StackCount       : 16 ''
+$$     +0x043 CurrentLocation  : 16 ''
+$$     +0x044 Cancel           : 0 ''
+$$     +0x045 CancelIrql       : 0 ''
+$$     +0x046 ApcEnvironment   : 0 ''
+$$     +0x047 AllocationFlags  : 0x2 ''
+$$     +0x048 UserIosb         : 0x0000001f`e2f7e618 _IO_STATUS_BLOCK
+$$     +0x048 IoRingContext    : 0x0000001f`e2f7e618 Void
+$$     +0x050 UserEvent        : 0xffffbf06`e4d3ab60 _KEVENT
+$$     +0x058 Overlay          : <unnamed-tag>
+$$     +0x068 CancelRoutine    : (null) 
+$$     +0x070 UserBuffer       : (null) 
+$$     +0x078 Tail             : <unnamed-tag>
+$$         +0x000 Overlay          : <unnamed-tag>
+$$         +0x000 DeviceQueueEntry : _KDEVICE_QUEUE_ENTRY
+$$         +0x000 DriverContext    : [4] (null) 
+$$         +0x020 Thread           : 0xffffbf06`c9657080 _ETHREAD
+$$         +0x028 AuxiliaryBuffer  : (null) 
+$$         +0x030 ListEntry        : _LIST_ENTRY [ 0x00000000`00000000 - 0x00000000`00000000 ]
+$$         +0x040 CurrentStackLocation : 0xffffbf06`e505ef28 _IO_STACK_LOCATION
+$$             +0x000 MajorFunction    : 0xe ''
+$$             +0x001 MinorFunction    : 0 ''
+$$             +0x002 Flags            : 0 ''
+$$             +0x003 Control          : 0 ''
+$$             +0x008 Parameters       : <unnamed-tag>
+$$             +0x028 DeviceObject     : 0xffffbf06`c80c5a70 _DEVICE_OBJECT
+$$             +0x030 FileObject       : 0xffffbf06`e3f20960 _FILE_OBJECT
+$$             +0x038 CompletionRoutine : (null) 
+$$             +0x040 Context          : (null) 
+$$         +0x040 PacketType       : 0xe505ef28
+$$         +0x048 OriginalFileObject : 0xffffbf06`e3f20960 _FILE_OBJECT
+$$     +0x000 Apc              : _KAPC
+$$     +0x000 CompletionKey    : (null) 
+$$
+
+$$ Store IO_STACK_LOCATION address in $t0
+r $t0 = poi(@rdx + 0xb8)
+
+$$ Store MajorFunction, MinorFunction, etc in $t1
+r $t1 = poi(@$t0 + 0x00)
+.printf "MJ/MN Functions: 0x%08x, ", @$t1
+
+$$ Store Parameters in $t2 - $t5
+r $t2 = poi(@$t0 + 0x08)
+r $t3 = poi(@$t0 + 0x10)
+r $t4 = poi(@$t0 + 0x18)
+r $t5 = poi(@$t0 + 0x20)
+.printf "Parameters: 0x%x, 0x%x, 0x%x, 0x%x\n\n", @$t2, @$t3, @$t4, @$t5
