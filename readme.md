@@ -729,6 +729,20 @@ ESP       EIP
 - ```!threads``` - list the managed threads and can be used to change context to a different thread
 - ```!dumpmodule -mt <module>``` - List method tables in a module
 
+### Finding reference counters of kernel objects
+
+```
+1: kd> ?? sizeof(_OBJECT_HEADER) 
+unsigned int64 0x38
+1: kd> dt (0xffff8005`41f16d70 - 0x38) nt!_OBJECT_HEADER
+   +0x000 PointerCount     : 0n0
+   +0x008 HandleCount      : 0n4
+   +0x008 NextToFree       : 0x00000000`00000004 Void
+   +0x010 Lock             : _EX_PUSH_LOCK
+```
+where 0xffff8005`41f16d70 is the PDEVICE_OBJECT type here, but it could have been any kernel object pointer.
+
+	
 ### Managed breakpoints
 
 There are 2 ways to put a breakpoint on a managed method:
